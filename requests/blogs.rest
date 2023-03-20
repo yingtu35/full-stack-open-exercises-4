@@ -7,6 +7,5 @@ Content-Type: application/json
 {
     "title": "Second interesting blog",
     "author": "Ying Tu",
-    "url": "yingtu.com",
     "likes": 10898
 }

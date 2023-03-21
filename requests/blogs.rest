@@ -5,7 +5,21 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Second interesting blog",
+    "title": "Third interesting blog",
     "author": "Ying Tu",
-    "likes": 10898
+    "url": "Yingtu.com/blog/3",
+    "likes": 123
+}
+
+###
+DELETE http://localhost:3003/api/blogs/123
+
+###
+PUT http://localhost:3003/api/blogs/64194e55618c1d37b2c5137e
+Content-Type: application/json
+
+{
+    "title": "Third interesting blog",
+    "author": "Ying Tu",
+    "likes": 156
 }

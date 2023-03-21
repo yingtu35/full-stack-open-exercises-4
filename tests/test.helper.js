@@ -33,6 +33,20 @@ const initialBlogs = [
     }  
 ]
 
+const nonExistingId = async () => {
+    const nonExistingBlog = {
+        title: "nonexisting blog",
+        author: "Ying Tu",
+        url: "http://nonexistingblog.com",
+        likes: 0
+    }
+    const blog = new Blog(nonExistingBlog)
+    const returnedBlog = await blog.save()
+    const id = returnedBlog.id
+    await Blog.findByIdAndDelete(id)
+    return id
+}
+
 module.exports = {
-    initialBlogs
+    initialBlogs, nonExistingId
 }

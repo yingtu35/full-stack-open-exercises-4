@@ -96,6 +96,71 @@ describe("adding a new blog", () => {
     })
 })
 
+describe("deleting a blog", () => {
+    test("return 204 with valid id that exists in the database", async () => {
+        const response = await api.get("/api/blogs")
+        const firstBlog = response.body[0]
+        
+        await api
+            .delete(`/api/blogs/${firstBlog.id}`)
+            .expect(204)
+    })
+
+    test("return 204 with valid id that doest not exists in the database", async () => {
+        const id = await listHelper.nonExistingId()
+        
+        await api
+            .delete(`/api/blogs/${id}`)
+            .expect(204)
+    })
+
+    test("return 400 with malformatted id", async () => {
+        const malformattedId = "123"
+        
+        await api
+            .delete(`/api/blogs/${malformattedId}`)
+            .expect(400)
+    })
+})
+
+describe("updating a blog", () => {
+    test("succeeds with existing id and return the updated blog", async () => {
+        const response = await api.get("/api/blogs")
+        const firstBlog = response.body[0]
+        console.log(firstBlog)
+        const newBlog = {
+            ...firstBlog,
+            likes: 500
+        }
+
+        const res = await api
+            .put(`/api/blogs/${firstBlog.id}`)
+            .send(newBlog)
+            .expect(200)
+            .expect("Content-Type", /application\/json/)
+
+        const returnedBlog = res.body
+        
+        expect(returnedBlog.likes).toBe(newBlog.likes)
+    })
+
+    test("fails with status 404 for non-existing id", async () => {
+        const id = await listHelper.nonExistingId()
+        
+        await api
+            .put(`/api/blogs/${id}`)
+            .expect(404)
+    })
+
+    test("fails with status 400 for malformatted id", async () => {
+        const id = "123"
+        
+        await api
+            .put(`/api/blogs/${id}`)
+            .expect(400)
+    })
+})
+
 
 afterAll(() => {
     mongoose.connection.close()

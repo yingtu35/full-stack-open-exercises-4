@@ -3,19 +3,32 @@ GET http://localhost:3003/api/blogs
 ###
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsIm5hbWUiOiJkYW5pZWwiLCJpZCI6IjY0MWIxNWRlYmZkOWQ2ZDkzZDg5ZDY3YiIsImlhdCI6MTY3OTQ5NzU2OSwiZXhwIjoxNjc5NDk4MTY5fQ.V_Lcf0s4xhGOAF7oFut1K8PzqT7MEjPBGu8ZpJvzh90
 
 {
-    "title": "Third interesting blog",
-    "author": "Ying Tu",
-    "url": "Yingtu.com/blog/3",
-    "likes": 123
+    "title": "jwt is very interesting",
+    "author": "daniel",
+    "url": "daniel.com/blog/2",
+    "likes": 0
 }
 
 ###
-DELETE http://localhost:3003/api/blogs/123
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "7th interesting blog",
+    "author": "root",
+    "url": "root.com/blog/1",
+    "likes": 123456
+}
 
 ###
-PUT http://localhost:3003/api/blogs/64194e55618c1d37b2c5137e
+DELETE http://localhost:3003/api/blogs/641b1973221c838c3b3a11f4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsIm5hbWUiOiJkYW5pZWwiLCJpZCI6IjY0MWIxNWRlYmZkOWQ2ZDkzZDg5ZDY3YiIsImlhdCI6MTY3OTQ5NzU2OSwiZXhwIjoxNjc5NDk4MTY5fQ.V_Lcf0s4xhGOAF7oFut1K8PzqT7MEjPBGu8ZpJvzh90
+
+###
+PUT http://localhost:3003/api/blogs/6419533d77649ca4ed310bc5
 Content-Type: application/json
 
 {

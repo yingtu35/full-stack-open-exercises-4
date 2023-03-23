@@ -30,7 +30,7 @@ blogRouter.post("/", async (request, response, next) => {
 blogRouter.delete("/:id", async (request, response) => {
     const user = request.user
     const blog = await Blog.findById(request.params.id)
-    console.log(blog.user)
+    // console.log(blog.user)
     if (!blog || blog.user.toString() !== user._id.toString()) {
         return response.status(403).send({ error: "blog deletion forbidden" })
     }
@@ -42,6 +42,13 @@ blogRouter.delete("/:id", async (request, response) => {
 
 blogRouter.put("/:id", async (request, response, next) => {
     const body = request.body
+    const user = request.user
+    const userBlogs = user.blogs.map(blog => blog.toString())
+    const isUserBlog = userBlogs.includes(request.params.id)
+    if (!isUserBlog) {
+        return response.status(403).send({ error: "blog update forbidden" })
+    }
+
     const newBlog = {
         title: body.title,
         author: body.author,

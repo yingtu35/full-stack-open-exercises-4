@@ -1,6 +1,7 @@
 const Blog = require("../models/blog")
 const User = require("../models/user")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const initialBlogs = [
     {
@@ -35,6 +36,35 @@ const initialBlogs = [
     }  
 ]
 
+const initialUsers = [
+    {
+        username: "root",
+        password: "root",
+        name: "admin"
+    },
+    {
+        username: "daniel",
+        password: "daniel",
+        name: "daniel"
+    }
+]
+
+const initializeBlogs = async () => {
+    await Blog.deleteMany()
+    const users = await initializeUsers()
+    const firstUser = users[0]
+    const blogs = initialBlogs.map(blog => {
+        return {
+            ...blog,
+            user: firstUser.id
+        }
+    })
+    const returnedBlogs = await Blog.insertMany(blogs)
+    const returnedIds = returnedBlogs.map(blog => blog._id)
+    firstUser.blogs = firstUser.blogs.concat(returnedIds)
+    await firstUser.save()
+}
+
 const nonExistingId = async () => {
     const nonExistingBlog = {
         title: "nonexisting blog",
@@ -49,22 +79,86 @@ const nonExistingId = async () => {
     return id
 }
 
-const initialUsers = async () => {
-    const initialUser = new User({
-        username: "root",
-        passwordHash: await bcrypt.hash("root", 10),
-        name: "admin"
+const initializeUsers = async () => {
+    await User.deleteMany()
+    const firstUser = new User({
+        username: initialUsers[0].username,
+        passwordHash: await bcrypt.hash(initialUsers[0].password, 10),
+        name: initialUsers[0].name
     })
-    await initialUser.save()
+    await firstUser.save()
+    const secondUser = new User({
+        username: initialUsers[1].username,
+        passwordHash: await bcrypt.hash(initialUsers[1].password, 10),
+        name: initialUsers[1].name
+    })
+    await secondUser.save()
+    const users = await User.find({})
+    return users
 }
 
+const getToken = async () => {
+    const firstUser = initialUsers[0]
+    const user = await User.findOne({username: firstUser.username})
+    
+    const payload = {
+        username: user.username,
+        name: user.name,
+        id: user._id
+    }
+
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: 600 })
+    const authorization = "Bearer " + token
+    return authorization
+}
+
+const getInvalidToken = async () => {
+    const firstUser = initialUsers[0]
+    const user = await User.findOne({username: firstUser.username})
+    
+    const payload = {
+        username: user.username,
+        name: user.name,
+    }
+
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: 600 })
+    const authorization = "Bearer " + token
+    return authorization
+}
+
+const getExpiredToken = async () => {
+    const firstUser = initialUsers[0]
+    const user = await User.findOne({username: firstUser.username})
+
+    const payload = {
+        username: user.username,
+        name: user.name,
+    }
+
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: 0 })
+    const authorization = "Bearer " + token
+    return authorization
+}
 const usersInDb = async () => {
     const users = await User.find({})
     return users.map(user => user.toJSON())
 }
 
+const blogsInDb = async () => {
+    const blogs = await Blog.find({})
+    return blogs.map(blog => blog.toJSON())
+}
+
 
 
 module.exports = {
-    initialBlogs, initialUsers, nonExistingId, usersInDb
+    initialBlogs, 
+    initializeBlogs, 
+    initializeUsers, 
+    nonExistingId, 
+    usersInDb, 
+    blogsInDb,
+    getToken, 
+    getInvalidToken, 
+    getExpiredToken
 }

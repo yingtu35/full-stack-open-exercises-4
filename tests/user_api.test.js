@@ -1,25 +1,42 @@
 const supertest = require("supertest")
 const app = require("../app")
 const mongoose = require("mongoose")
-const User = require("../models/user")
 const helper = require("./test.helper")
 
 const api = supertest(app)
 
 beforeEach(async () => {
-    await User.deleteMany()
-    await helper.initialUsers()
+    await helper.initializeUsers()
 })
 
+
+describe("viewing users list", () => {
+    test("return in json format", async () => {
+        await api
+            .get("/api/users")
+            .expect(200)
+            .expect("Content-Type", /application\/json/)
+    })
+})
+
+// TODO: add unique identifier test
+describe("the unique identifier of a user", () => {
+    test("is id", async () => {
+        const users = await helper.usersInDb()
+        const firstUser = users[0]
+
+        expect(firstUser.id).toBeDefined()
+    })
+})
 describe("adding a user", () => {  
 
     test("succeeds with valid form", async () => {
         const usersAtStart = await helper.usersInDb()
         
         const newUser = {
-            username: "daniel",
-            password: "daniel",
-            name: "Ying Tu"
+            username: "newUser",
+            password: "newUser",
+            name: "newUser"
         }
 
         const response = await api

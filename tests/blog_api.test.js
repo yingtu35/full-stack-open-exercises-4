@@ -218,52 +218,30 @@ describe("updating a blog", () => {
         expect(returnedBlog.likes).toBe(newBlog.likes)
     })
 
-    test("fails with status 403 when updating blogs user does not own", async () => {
-        const authorization = await helper.getToken()
-        const users = await helper.usersInDb()
-        const anotherUser = users[1]
-        const newBlog = new Blog({
-            title: "another user's blog",
-            author: anotherUser.name,
-            url: "anotherUser.com/blog/1",
-            likes: 0,
-            user: anotherUser.id
-        })
-        const returnedBlog = await newBlog.save()
-
-        const updateBlog = {
-            ...returnedBlog,
-            likes: 500
-        }
-        
-        await api
-            .put(`/api/blogs/${returnedBlog.id}`)
-            .set("Authorization", authorization)            
-            .send(updateBlog)
-            .expect(403)
-        
-        const blogAtEnd = await Blog.findById(returnedBlog._id)
-        expect(blogAtEnd.likes).toBe(newBlog.likes)
-    })
-
-    test("fails with status 403 for non-existing id", async () => {
+    test("fails with status 404 for non-existing id", async () => {
         const authorization = await helper.getToken()
         const id = await helper.nonExistingId()
+        const blogs = await helper.blogsInDb()         
+        const firstBlog = blogs[0]
         
         await api
             .put(`/api/blogs/${id}`)
-            .set("Authorization", authorization)            
-            .expect(403)
+            .set("Authorization", authorization)
+            .send(firstBlog)            
+            .expect(404)
     })
         
-    test("fails with status 403 for malformatted id", async () => {
+    test("fails with status 400 for malformatted id", async () => {
         const authorization = await helper.getToken()
         const id = "123"
+        const blogs = await helper.blogsInDb()         
+        const firstBlog = blogs[0]
         
         await api
             .put(`/api/blogs/${id}`)
-            .set("Authorization", authorization)            
-            .expect(403)
+            .set("Authorization", authorization)
+            .send(firstBlog)            
+            .expect(400)
     })
 })
 

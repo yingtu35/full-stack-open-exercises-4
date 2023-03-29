@@ -1,4 +1,4 @@
-const listHelper = require("../utils/list_helper")
+const listHelper = require("./list_helper")
 
 const listWithOneBlog = [{
     _id: "5a422a851b54a676234d17f7",

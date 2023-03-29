@@ -18,7 +18,7 @@ blogRouter.post("/", async (request, response, next) => {
         user: user.id
     })
     try {
-        const returnedBlog = await blog.save()
+        const returnedBlog = await (await blog.save()).populate("user", ["username", "name", "id"])
         user.blogs = user.blogs.concat(returnedBlog._id)
         await user.save()
         response.status(201).json(returnedBlog)
@@ -42,25 +42,26 @@ blogRouter.delete("/:id", async (request, response) => {
 
 blogRouter.put("/:id", async (request, response, next) => {
     const body = request.body
-    const user = request.user
-    const userBlogs = user.blogs.map(blog => blog.toString())
-    const isUserBlog = userBlogs.includes(request.params.id)
-    if (!isUserBlog) {
-        return response.status(403).send({ error: "blog update forbidden" })
-    }
+    // const user = request.user
+    // const userBlogs = user.blogs.map(blog => blog.toString())
+    // const isUserBlog = userBlogs.includes(request.params.id)
+    // if (!isUserBlog) {
+    //     return response.status(403).send({ error: "blog update forbidden" })
+    // }
 
     const newBlog = {
         title: body.title,
         author: body.author,
         url: body.url,
-        likes: body.likes || 0
+        likes: body.likes || 0,
+        user: body.user.id
     }
     const opts = {
         new: true,
         runValidators: true
     }
     try {
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newBlog, opts)
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newBlog, opts).populate("user", ["username", "name", "id"])
         if (updatedBlog) {
             response.status(200).json(updatedBlog)
         }
